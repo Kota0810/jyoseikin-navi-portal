@@ -5,127 +5,132 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="65歳超雇用推進助成金（65歳超継続雇用促進コース）の申請書類作成をサポートするAIエージェント。令和7年度版・令和8年度版に対応。">
 <meta name="robots" content="noindex">
-<title>書類作成AIエージェント | 65歳超雇用推進助成金</title>
+<title>書類作成エージェント | 年度を選択</title>
 <style>
+  /* アプリ側 app.py のデザイントークンと同じ値。片方だけ変えないこと。
+     入口の2画面（このポータルとログイン）は濃紺を全面に敷き、
+     白いカードを縦中央に置く。淡い下地に狭いカードを上寄せすると
+     周囲の空白が「余り」に見えるため。 */
   :root {
-    --bg: #f5f6f8;
-    --card: #ffffff;
-    --text: #1f2933;
-    --muted: #6b7280;
-    --border: #e5e7eb;
-    --accent-r7: #2563eb;
-    --accent-r8: #059669;
-    --shadow: 0 1px 3px rgba(0,0,0,0.05), 0 4px 16px rgba(0,0,0,0.04);
+    --ink: #12161D;
+    --ink-sub: #39424F;
+    --ink-muted: #67717F;
+    --line: #CBD2DC;
+    --line-soft: #DFE4EA;
+    --surface: #FFFFFF;
+    --navy: #1F3A5F;
+    --navy-tint: #F0F3F8;
+    --navy-line: #DCE3ED;
+    --sb-bg: #16283F;
+    --sb-fg: #E9EDF3;
+    --sb-muted: #93A3B8;
   }
 
   * { box-sizing: border-box; }
 
-  html, body {
+  html { height: 100%; }
+
+  body {
     margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    line-height: 1.6;
+    min-height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 24px;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI",
+                 "Hiragino Kaku Gothic ProN", "Hiragino Sans",
+                 "Yu Gothic UI", "Yu Gothic", Meiryo, sans-serif;
+    background: var(--sb-bg);
+    color: var(--ink);
+    line-height: 1.7;
     -webkit-font-smoothing: antialiased;
   }
 
-  .container {
-    max-width: 880px;
-    margin: 0 auto;
-    padding: 64px 24px 48px;
+  .stage { width: 100%; max-width: 860px; }
+
+  /* ───────── ブランド（濃紺の地の上） ───────── */
+  .brand {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 11px;
+    margin-bottom: 10px;
   }
 
-  header {
-    text-align: center;
-    margin-bottom: 48px;
-  }
-
-  .icon {
-    font-size: 48px;
-    line-height: 1;
-    margin-bottom: 16px;
-  }
-
-  h1 {
-    font-size: 28px;
+  .brand h1 {
+    font-size: 1.35rem;
     font-weight: 700;
-    margin: 0 0 12px;
-    letter-spacing: 0.02em;
-  }
-
-  .disclaimer {
-    color: #dc2626;
-    font-size: 14px;
+    color: #FFFFFF;
     margin: 0;
-    font-weight: 500;
+    letter-spacing: .01em;
+    line-height: 1.3;
   }
 
+  .lede {
+    margin: 0 0 26px;
+    text-align: center;
+    color: var(--sb-muted);
+    font-size: .88rem;
+  }
+
+  /* ───────── 年度カード ───────── */
   .cards {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
-  }
-
-  @media (max-width: 640px) {
-    .container { padding: 40px 20px; }
-    h1 { font-size: 22px; }
-    .cards { grid-template-columns: 1fr; }
+    gap: 18px;
   }
 
   .card {
-    background: var(--card);
-    border: 1px solid var(--border);
-    border-radius: 12px;
-    padding: 28px 24px;
-    box-shadow: var(--shadow);
+    background: var(--surface);
+    border: 1px solid transparent;
+    border-radius: 14px;
+    padding: 24px 22px 20px;
     text-decoration: none;
     color: inherit;
     display: flex;
     flex-direction: column;
-    transition: transform 0.15s ease, box-shadow 0.15s ease, border-color 0.15s ease;
-    position: relative;
+    box-shadow: 0 14px 36px rgba(0,0,0,.20);
+    transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
   }
 
   .card:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.06), 0 12px 28px rgba(0,0,0,0.08);
+    transform: translateY(-3px);
+    border-color: var(--navy-line);
+    box-shadow: 0 20px 48px rgba(0,0,0,.28);
   }
 
-  .card.r7:hover { border-color: var(--accent-r7); }
-  .card.r8:hover { border-color: var(--accent-r8); }
+  .card:focus-visible {
+    outline: none;
+    border-color: #FFFFFF;
+    box-shadow: 0 0 0 3px rgba(255,255,255,.45), 0 14px 36px rgba(0,0,0,.20);
+  }
 
   .badge {
     display: inline-block;
-    font-size: 12px;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: 999px;
-    margin-bottom: 16px;
     align-self: flex-start;
-    letter-spacing: 0.04em;
+    font-size: .74rem;
+    font-weight: 600;
+    letter-spacing: .03em;
+    padding: 3px 10px;
+    border-radius: 999px;
+    margin-bottom: 14px;
   }
 
-  .card.r7 .badge {
-    background: #eff6ff;
-    color: var(--accent-r7);
-  }
+  /* 年度の色分けはアプリ側のバッジと同じ規則（R7=グレー / R8=ネイビー） */
+  .card.r7 .badge { background: #E7EAEF; color: var(--ink-muted); }
+  .card.r8 .badge { background: var(--navy-tint); color: var(--navy); border: 1px solid var(--navy-line); }
 
-  .card.r8 .badge {
-    background: #ecfdf5;
-    color: var(--accent-r8);
-  }
-
-  .card h2 {
-    font-size: 20px;
+  .card .period {
+    font-size: 1.05rem;
     font-weight: 700;
-    margin: 0 0 8px;
+    margin: 0 0 4px;
+    color: var(--ink);
   }
 
-  .card p {
-    color: var(--muted);
-    font-size: 14px;
-    margin: 0 0 24px;
+  .card .desc {
+    color: var(--ink-muted);
+    font-size: .84rem;
+    margin: 0 0 20px;
     flex-grow: 1;
   }
 
@@ -133,69 +138,91 @@
     display: inline-flex;
     align-items: center;
     gap: 6px;
-    font-size: 14px;
+    font-size: .84rem;
     font-weight: 600;
+    color: var(--navy);
+    padding-top: 14px;
+    border-top: 1px solid var(--line-soft);
   }
 
-  .card.r7 .cta { color: var(--accent-r7); }
-  .card.r8 .cta { color: var(--accent-r8); }
+  .cta svg { transition: transform .15s ease; }
+  .card:hover .cta svg { transform: translateX(3px); }
 
-  .cta::after {
-    content: "→";
-    transition: transform 0.15s ease;
+  /* ───────── 注記・免責 ───────── */
+  .note {
+    margin-top: 18px;
+    padding: 13px 18px;
+    background: rgba(255,255,255,.07);
+    border: 1px solid rgba(255,255,255,.14);
+    border-left: 3px solid rgba(255,255,255,.5);
+    border-radius: 8px;
+    color: var(--sb-fg);
+    font-size: .82rem;
   }
 
-  .card:hover .cta::after {
-    transform: translateX(3px);
+  .disclaimer {
+    margin: 22px auto 0;
+    max-width: 40rem;
+    text-align: center;
+    color: var(--sb-muted);
+    font-size: .78rem;
+    line-height: 1.75;
   }
 
   footer {
-    margin-top: 56px;
+    margin-top: 26px;
     text-align: center;
-    color: var(--muted);
-    font-size: 12px;
+    color: rgba(147,163,184,.7);
+    font-size: .74rem;
   }
 
-  .note {
-    margin-top: 32px;
-    padding: 16px 20px;
-    background: #fffbeb;
-    border: 1px solid #fde68a;
-    border-radius: 8px;
-    color: #78350f;
-    font-size: 13px;
+  @media (max-width: 640px) {
+    body { padding: 28px 18px; align-items: flex-start; }
+    .cards { grid-template-columns: 1fr; }
+    .brand h1 { font-size: 1.15rem; }
   }
 </style>
 </head>
 <body>
-  <div class="container">
-    <header>
-      <div class="icon" aria-hidden="true">🛡️</div>
-      <h1>書類作成AIエージェント</h1>
-      <p class="disclaimer">AIによる書類作成サポートです。<br>情報の正確性については保証されておりません。必要に応じて最新の公式情報をご確認ください。</p>
-    </header>
+  <div class="stage">
+    <div class="brand">
+      <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+        <path d="M16 2.6 27 6.3v9.2c0 7.1-4.4 12.3-11 14.9-6.6-2.6-11-7.8-11-14.9V6.3L16 2.6Z" fill="#FFFFFF"/>
+        <path d="M11.8 12.4h8.4M11.8 16.2h8.4M11.8 20h5" stroke="#16283F" stroke-width="1.7" stroke-linecap="round"/>
+      </svg>
+      <h1>書類作成エージェント</h1>
+    </div>
+    <p class="lede">申請対象の年度を選択してください。</p>
 
     <main class="cards">
       <a class="card r7" href="https://jyoseikin-navi-r07.streamlit.app/" target="_blank" rel="noopener">
         <span class="badge">令和7年度版</span>
-        <p>2025年4月～2026年3月までの支給要領に対応したエージェント</p>
-        <span class="cta">エージェントを開く</span>
+        <p class="period">2025年4月 〜 2026年3月</p>
+        <p class="desc">上記期間の支給要領に対応したエージェント</p>
+        <span class="cta">エージェントを開く
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </span>
       </a>
 
       <a class="card r8" href="https://jyoseikin-navi-r08.streamlit.app/" target="_blank" rel="noopener">
         <span class="badge">令和8年度版</span>
-        <p>2026年4月～2027年3月までの支給要領に対応したエージェント</p>
-        <span class="cta">エージェントを開く</span>
+        <p class="period">2026年4月 〜 2027年3月</p>
+        <p class="desc">上記期間の支給要領に対応したエージェント</p>
+        <span class="cta">エージェントを開く
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+        </span>
       </a>
     </main>
 
     <div class="note">
-      ※ 年度によって支給要領・様式が異なります。申請対象の年度に合わせて選択してください。
+      年度によって支給要領・様式が異なります。申請対象の年度に合わせて選択してください。
     </div>
 
-    <footer>
-      &copy; 書類作成AIエージェント
-    </footer>
+    <p class="disclaimer">
+      AIによる書類作成サポートです。情報の正確性については保証されておりません。必要に応じて最新の公式情報をご確認ください。
+    </p>
+
+    <footer>&copy; 書類作成エージェント</footer>
   </div>
 </body>
 </html>
